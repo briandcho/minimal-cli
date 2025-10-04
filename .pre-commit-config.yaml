@@ -1,0 +1,63 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_install_hook_types: [pre-commit, commit-msg]
+repos:
+-   repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+    -   id: bandit
+        args: ["--exclude", "tests"]
+-   repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+    -   id: detect-secrets
+        name: detect-secrets scan for secrets
+        require_serial: true
+-   repo: https://github.com/bridgecrewio/checkov
+    rev: 3.2.485
+    hooks:
+    -   id: checkov
+        name: checkov IaC security scanner
+        files: \.github/workflows/.*\.ya?ml$
+        entry: checkov --framework github_actions
+        require_serial: true
+-   repo: https://github.com/pypa/pip-audit
+    rev: v2.9.0
+    hooks:
+    -   id: pip-audit
+        name: pip-audit dependency vulnerability scanner
+        args: ["-r", "requirements.txt"]
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: check-toml
+    -   id: debug-statements
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.1
+    hooks:
+    -   id: ruff  # includes flake8 functionality
+        args: [--fix, --exit-non-zero-on-fix]
+    -   id: ruff-format
+-   repo: https://github.com/tox-dev/pyproject-fmt
+    rev: "v2.11.0"
+    hooks:
+    -   id: pyproject-fmt
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.2
+    hooks:
+    -   id: mypy
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.0
+    hooks:
+    -   id: pyupgrade
+        args: [--py311-plus]
+
+-   repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.9.1
+    hooks:
+    -   id: commitizen
+        stages: [commit-msg]

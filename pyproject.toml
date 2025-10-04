@@ -1,0 +1,92 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=69", "setuptools-scm>=8" ]
+
+[project]
+name = "minimal-cli"
+description = "A minimal CLI tool scaffold"
+readme = "README.md"
+license = { file = "LICENSE" }
+
+authors = [
+  { name = "Brian Cho", email = "briandcho@yahoo.com" },
+]
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dynamic = [
+  "version",
+]
+
+optional-dependencies.dev = [
+  "covdefaults",
+  "pytest-cov",
+]
+scripts.minimal-cli = "minimal_cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "." }
+
+[tool.setuptools.packages.find]
+exclude = [ "tests", "tests.*" ]
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+
+[tool.coverage.run]
+plugins = [ "covdefaults" ]
+
+[tool.tox]
+legacy_tox_ini = '''
+[tox]
+env_list = py, pre-commit
+skipsdist = true
+
+[testenv]
+description = Run pytest with coverage
+deps = -r requirements-dev.txt
+pass_env = PYTHONPATH
+commands =
+    coverage erase
+    coverage run -m pytest
+    coverage report --show-missing
+
+[testenv:pre-commit]
+description = Run pre-commit hooks on all files
+deps = pre-commit
+skip_install = true
+commands = pre-commit run --all-files --show-diff-on-failure
+
+[testenv:update_deps]
+description = Update requirements*.txt files and pre-commit hooks
+deps =
+    pip-tools
+    pre-commit
+skip_install = true
+commands =
+    pip-compile pyproject.toml --generate-hashes
+    pip-compile pyproject.toml --extra dev --output-file=requirements-dev.txt
+    pre-commit autoupdate
+'''
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.commitizen]
+name = "cz_conventional_commits"
