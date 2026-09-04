@@ -2,13 +2,9 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
-from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as resolve_package_version
 
-try:
-    __version__ = resolve_package_version("minimal-cli")
-except PackageNotFoundError:
-    __version__ = "0+unknown"
+__version__ = resolve_package_version("minimal-cli")
 
 
 def create_parser() -> argparse.ArgumentParser:
