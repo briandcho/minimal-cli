@@ -24,7 +24,7 @@ jobs:
       # Trufflehog runs as a standalone CI step because there's no maintained
       # pre-commit hook available for it
       - name: Run Trufflehog secret scanner
-        uses: trufflesecurity/trufflehog@v3
+        uses: trufflesecurity/trufflehog@v3.97.4
         with:
           path: .
 
