@@ -1,13 +1,10 @@
 name: Release
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,11 +23,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Tags this template repo itself (vX.Y.Z, from Conventional Commits) and updates
-      # CHANGELOG.md, so `copier copy` (which defaults to the latest tag) always resolves
-      # to a working template. No pypi_token: this repo isn't a published package — only
-      # the *generated* project (via template/.github/workflows/release.yml) publishes to PyPI.
+      # Tags this template repo itself (vX.Y.Z, from Conventional Commits) so `copier copy`
+      # (which defaults to the latest tag) always resolves to a working template. No pypi_token:
+      # this repo isn't a published package — only the *generated* project (via
+      # template/.github/workflows/release.yml) publishes to PyPI. Manual trigger only: tagging
+      # is a deliberate action, not an automatic side effect of pushing to main. No changelog: a
+      # tracked CHANGELOG.md duplicates the GitHub Release notes this step already publishes, and
+      # nothing in this repo consumes it (it isn't installed as a package).
+      - name: Install python-semantic-release
+        run: pip install python-semantic-release==9.8.6
+
       - name: Run Python Semantic Release
-        uses: python-semantic-release/python-semantic-release@v9.8.6
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release version --no-changelog --no-commit

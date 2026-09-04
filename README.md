@@ -12,9 +12,9 @@ Generate a new project:
 copier copy https://github.com/briandcho/minimal-cli my-project
 ```
 
-`copier copy` fetches this repo's *latest git tag* by default (not `main`'s HEAD) — releases are
-tagged automatically by `.github/workflows/release.yml` from Conventional Commits, so pushes to
-`main` always leave a current tag for `copier copy` to resolve.
+`copier copy` fetches this repo's *latest git tag* by default (not `main`'s HEAD). Releases are cut
+manually by running `.github/workflows/release.yml` (`workflow_dispatch`), which tags the next
+version from Conventional Commits — see `CLAUDE.md` if you're maintaining this repo.
 
 You'll be asked for:
 

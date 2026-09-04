@@ -58,12 +58,21 @@ copier copy . /tmp/my-project
   my-project` (no explicit `--vcs-ref`) makes copier fetch the *latest git tag*, not `main`'s
   HEAD. So the tag has to actually point at a commit containing `copier.yml`/`template/` for the
   command in the README to work — a stale or missing tag silently serves an old/broken template.
-- `.github/workflows/release.yml` at the repo root runs `python-semantic-release` on every push to
-  `main`, tagging `vX.Y.Z` from Conventional Commits and updating root `CHANGELOG.md`. It has no
-  `pypi_token` and never builds/publishes anything — this repo isn't a package, tagging is purely
-  so `copier copy` has something current to resolve. (`tests/minimal_cli_test.py`'s own
-  `generate()` sidesteps this by passing `vcs_ref="HEAD"`, so local test runs always exercise the
-  current checkout regardless of tags.)
+- `.github/workflows/release.yml` at the repo root is **manual-only** (`workflow_dispatch`, no
+  `push` trigger) — running `python-semantic-release version --no-changelog --no-commit`, which
+  tags `vX.Y.Z` from Conventional Commits, pushes the tag, and publishes a GitHub Release, but only
+  when someone deliberately runs the workflow. It has no `pypi_token` and never builds/publishes
+  anything — this repo isn't a package, tagging is purely so `copier copy` has something current to
+  resolve. There's no root `CHANGELOG.md`: it would just duplicate the notes on the GitHub Release
+  page this step already publishes, and nothing here consumes it (this repo isn't installed as a
+  package). (`tests/minimal_cli_test.py`'s own `generate()` sidesteps tag resolution entirely by
+  passing `vcs_ref="HEAD"`, so local test runs always exercise the current checkout regardless of
+  tags.)
+- If this repo ever opens to real external code contributions, revisit this: `commitizen`'s
+  Conventional-Commit enforcement is a local git hook contributors won't have installed, and
+  `googleapis/release-please-action` (a PR-based release flow versioned from Conventional-Commit-
+  style PR titles, going through normal PR review rather than a one-off manual trigger) would be
+  a better fit at that point.
 - The workflows shipped inside `template/.github/workflows/` (`ci.yml`, `release.yml`,
   `auto-update-deps.yml`) are a *separate*, unrelated release process — the *generated* project's
   own versioning (`setuptools-scm` git-tag-based versioning, its own `python-semantic-release` run,
