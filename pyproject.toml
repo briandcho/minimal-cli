@@ -52,10 +52,12 @@ run.plugins = [ "covdefaults" ]
 legacy_tox_ini = '''
 [tox]
 env_list = py, pre-commit
-skipsdist = true
 
 [testenv]
 description = Run pytest with coverage
+# usedevelop installs the project package (editable) into the env; without it,
+# __version__'s importlib.metadata lookup in minimal_cli.py raises PackageNotFoundError.
+usedevelop = true
 deps = -r requirements-dev.txt
 pass_env = PYTHONPATH
 commands =
