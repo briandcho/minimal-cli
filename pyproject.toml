@@ -7,7 +7,6 @@ name = "minimal-cli"
 description = "A minimal CLI tool scaffold"
 readme = "README.md"
 license = { file = "LICENSE" }
-
 authors = [
   { name = "Brian Cho", email = "briandcho@yahoo.com" },
 ]
@@ -23,7 +22,6 @@ classifiers = [
 dynamic = [
   "version",
 ]
-
 optional-dependencies.dev = [
   "covdefaults",
   "pytest-cov",
@@ -31,17 +29,24 @@ optional-dependencies.dev = [
 scripts.minimal-cli = "minimal_cli:main"
 
 [tool.setuptools]
+packages.find.exclude = [ "tests", "tests.*" ]
 package-dir = { "" = "." }
-
-[tool.setuptools.packages.find]
-exclude = [ "tests", "tests.*" ]
 
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
 
-[tool.coverage.run]
-plugins = [ "covdefaults" ]
+[tool.mypy]
+disallow_any_generics = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+overrides = [ { module = "tests.*", disallow_untyped_defs = false } ]
+
+[tool.coverage]
+run.plugins = [ "covdefaults" ]
 
 [tool.tox]
 legacy_tox_ini = '''
@@ -75,18 +80,6 @@ commands =
     pip-compile pyproject.toml --extra dev --output-file=requirements-dev.txt
     pre-commit autoupdate
 '''
-
-[tool.mypy]
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
 
 [tool.commitizen]
 name = "cz_conventional_commits"

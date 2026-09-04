@@ -1,6 +1,6 @@
 import pytest
 
-from minimal_cli import main, __version__
+from minimal_cli import __version__, main
 
 
 @pytest.mark.parametrize(

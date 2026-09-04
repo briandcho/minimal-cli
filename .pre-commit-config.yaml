@@ -3,7 +3,7 @@
 default_install_hook_types: [pre-commit, commit-msg]
 repos:
 -   repo: https://github.com/PyCQA/bandit
-    rev: 1.8.6
+    rev: 1.9.4
     hooks:
     -   id: bandit
         args: ["--exclude", "tests"]
@@ -14,7 +14,7 @@ repos:
         name: detect-secrets scan for secrets
         require_serial: true
 -   repo: https://github.com/bridgecrewio/checkov
-    rev: 3.2.485
+    rev: 3.3.16
     hooks:
     -   id: checkov
         name: checkov IaC security scanner
@@ -22,7 +22,7 @@ repos:
         entry: checkov --framework github_actions
         require_serial: true
 -   repo: https://github.com/pypa/pip-audit
-    rev: v2.9.0
+    rev: v2.10.1
     hooks:
     -   id: pip-audit
         name: pip-audit dependency vulnerability scanner
@@ -37,27 +37,27 @@ repos:
     -   id: check-toml
     -   id: debug-statements
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.1
+    rev: v0.16.6
     hooks:
     -   id: ruff  # includes flake8 functionality
         args: [--fix, --exit-non-zero-on-fix]
     -   id: ruff-format
 -   repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.11.0"
+    rev: "v2.29.3"
     hooks:
     -   id: pyproject-fmt
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v2.3.1
     hooks:
     -   id: mypy
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.0
+    rev: v3.21.2
     hooks:
     -   id: pyupgrade
         args: [--py311-plus]
 
 -   repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.9.1
+    rev: v4.18.0
     hooks:
     -   id: commitizen
         stages: [commit-msg]

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 import argparse
-from importlib.metadata import PackageNotFoundError, version as resolve_package_version
-
+from collections.abc import Sequence
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as resolve_package_version
 
 try:
     __version__ = resolve_package_version("minimal-cli")
