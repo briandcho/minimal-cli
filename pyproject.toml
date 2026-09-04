@@ -49,39 +49,30 @@ overrides = [ { module = "tests.*", disallow_untyped_defs = false } ]
 run.plugins = [ "covdefaults" ]
 
 [tool.tox]
-legacy_tox_ini = '''
-[tox]
-env_list = py, pre-commit
-
-[testenv]
-description = Run pytest with coverage
-# usedevelop installs the project package (editable) into the env; without it,
+env_list = [ "pre-commit", "py" ]
+env.pre-commit.description = "Run all pre-commit hooks"
+env.pre-commit.skip_install = true
+env.pre-commit.deps = [ "pre-commit" ]
+env.pre-commit.commands = [ [ "pre-commit", "run", "--all-files", "--show-diff-on-failure" ] ]
+env.update_deps.description = "Update requirements*.txt files and pre-commit hooks"
+env.update_deps.skip_install = true
+env.update_deps.deps = [ "pip-tools", "pre-commit" ]
+env.update_deps.commands = [
+  [ "pip-compile", "pyproject.toml", "--generate-hashes" ],
+  [ "pip-compile", "pyproject.toml", "--extra", "dev", "--output-file=requirements-dev.txt" ],
+  [ "pre-commit", "autoupdate" ],
+]
+env_run_base.description = "Run pytest with coverage"
+# package = "editable" installs the project package (editable) into the env; without it,
 # __version__'s importlib.metadata lookup in minimal_cli.py raises PackageNotFoundError.
-usedevelop = true
-deps = -r requirements-dev.txt
-pass_env = PYTHONPATH
-commands =
-    coverage erase
-    coverage run -m pytest
-    coverage report --show-missing
-
-[testenv:pre-commit]
-description = Run pre-commit hooks on all files
-deps = pre-commit
-skip_install = true
-commands = pre-commit run --all-files --show-diff-on-failure
-
-[testenv:update_deps]
-description = Update requirements*.txt files and pre-commit hooks
-deps =
-    pip-tools
-    pre-commit
-skip_install = true
-commands =
-    pip-compile pyproject.toml --generate-hashes
-    pip-compile pyproject.toml --extra dev --output-file=requirements-dev.txt
-    pre-commit autoupdate
-'''
+env_run_base.package = "editable"
+env_run_base.deps = [ "-r requirements-dev.txt" ]
+env_run_base.pass_env = [ "PYTHONPATH" ]
+env_run_base.commands = [
+  [ "coverage", "erase" ],
+  [ "coverage", "run", "-m", "pytest" ],
+  [ "coverage", "report", "--show-missing" ],
+]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
