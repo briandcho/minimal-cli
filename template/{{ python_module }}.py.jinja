@@ -4,7 +4,7 @@ import argparse
 from collections.abc import Sequence
 from importlib.metadata import version as resolve_package_version
 
-__version__ = resolve_package_version("minimal-cli")
+__version__ = resolve_package_version("{{ project_name }}")
 
 
 def create_parser() -> argparse.ArgumentParser:

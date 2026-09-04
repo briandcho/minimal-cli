@@ -1,10 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 default_install_hook_types: [pre-commit, pre-push, commit-msg]
-# template/ is copier payload, not this repo's own source: its verbatim-copied .py/.yml files
-# would otherwise clash with tooling that assumes one importable tree (e.g. mypy sees two
-# "tests" packages) or get needlessly linted for content this repo doesn't own.
-exclude: ^template/
 repos:
 -   repo: https://github.com/PyCQA/bandit
     rev: 1.9.4
@@ -31,7 +27,7 @@ repos:
     hooks:
     -   id: pip-audit
         name: pip-audit dependency vulnerability scanner
-        args: ["-r", "requirements-dev.txt"]
+        args: ["-r", "requirements.txt"]
         stages: [pre-push]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

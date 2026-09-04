@@ -1,7 +1,15 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=69", "setuptools-scm>=8" ]
+
 [project]
-name = "minimal-cli-template"
-version = "0.0.0"
-description = "Copier template for scaffolding a minimal Python CLI project"
+name = "{{ project_name }}"
+description = "{{ description }}"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+  { name = "{{ author_name }}", email = "{{ author_email }}" },
+]
 requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
@@ -11,12 +19,22 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = []
+dynamic = [
+  "version",
+]
 optional-dependencies.dev = [
-  "copier",
   "covdefaults",
   "pytest-cov",
 ]
+scripts."{{ project_name }}" = "{{ python_module }}:main"
+
+[tool.setuptools]
+packages.find.exclude = [ "tests", "tests.*" ]
+package-dir = { "" = "." }
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
 
 [tool.mypy]
 disallow_any_generics = true
@@ -39,17 +57,18 @@ env.pre-commit.deps = [ "pre-commit" ]
 # for local dev use; they still run on `git push` (if the pre-push hook type is installed) and
 # as standalone steps in CI's security job.
 env.pre-commit.commands = [ [ "pre-commit", "run", "--all-files", "--show-diff-on-failure" ] ]
-env.update_deps.description = "Update requirements-dev.txt and pre-commit hooks"
+env.update_deps.description = "Update requirements*.txt files and pre-commit hooks"
 env.update_deps.skip_install = true
 env.update_deps.deps = [ "pip-tools", "pre-commit" ]
 env.update_deps.commands = [
+  [ "pip-compile", "pyproject.toml", "--generate-hashes" ],
   [ "pip-compile", "pyproject.toml", "--extra", "dev", "--output-file=requirements-dev.txt" ],
   [ "pre-commit", "autoupdate" ],
 ]
-env_run_base.description = "Run pytest with coverage against the template's generation tests"
-# This repo isn't an installable package (it's a copier template + its own meta-tooling), so
-# there's nothing to install into the tox env.
-env_run_base.skip_install = true
+env_run_base.description = "Run pytest with coverage"
+# package = "editable" installs the project package (editable) into the env; without it,
+# __version__'s importlib.metadata lookup in {{ python_module }}.py raises PackageNotFoundError.
+env_run_base.package = "editable"
 env_run_base.deps = [ "-r requirements-dev.txt" ]
 env_run_base.pass_env = [ "PYTHONPATH" ]
 env_run_base.commands = [

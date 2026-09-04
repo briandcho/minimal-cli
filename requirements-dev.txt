@@ -4,23 +4,73 @@
 #
 #    pip-compile --extra=dev --no-index --output-file=requirements-dev.txt pyproject.toml
 #
+annotated-types==0.8.0
+    # via pydantic
+colorama==0.4.6
+    # via copier
+copier==9.18.1
+    # via minimal-cli-template (pyproject.toml)
 covdefaults==2.3.0
-    # via minimal-cli (pyproject.toml)
+    # via minimal-cli-template (pyproject.toml)
 coverage[toml]==7.11.0
     # via
     #   covdefaults
     #   pytest-cov
+dunamai==1.26.2
+    # via copier
+funcy==2.0
+    # via copier
 iniconfig==2.3.0
     # via pytest
+jinja2==3.1.6
+    # via
+    #   copier
+    #   jinja2-ansible-filters
+jinja2-ansible-filters==1.3.2
+    # via copier
+markupsafe==3.0.3
+    # via jinja2
 packaging==25.0
-    # via pytest
+    # via
+    #   copier
+    #   dunamai
+    #   pytest
+pathspec==1.1.1
+    # via copier
+platformdirs==4.11.7
+    # via copier
 pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-pygments==2.19.2
-    # via pytest
-pytest==8.4.2
+plumbum==2.0.2
+    # via copier
+prompt-toolkit==3.0.53
+    # via questionary
+pydantic==2.13.5
+    # via copier
+pydantic-core==2.46.5
+    # via pydantic
+pygments==2.21.0
+    # via
+    #   copier
+    #   pytest
+pytest==9.1.1
     # via pytest-cov
 pytest-cov==7.0.0
-    # via minimal-cli (pyproject.toml)
+    # via minimal-cli-template (pyproject.toml)
+pyyaml==6.0.3
+    # via
+    #   copier
+    #   jinja2-ansible-filters
+questionary==2.1.1
+    # via copier
+typing-extensions==4.16.0
+    # via
+    #   pydantic
+    #   pydantic-core
+    #   typing-inspection
+typing-inspection==0.4.4
+    # via pydantic
+wcwidth==0.8.3
+    # via prompt-toolkit

@@ -1,0 +1,32 @@
+_subdirectory: template
+
+project_name:
+  type: str
+  help: "Project name (kebab-case, e.g. my-project)"
+  default: my-project
+  validator: >-
+    {% if not (project_name | regex_search('^[a-z][a-z0-9]*(-[a-z0-9]+)*$')) %}
+    project_name must be lowercase kebab-case (letters, digits, hyphens), starting with a letter
+    {% endif %}
+
+python_module:
+  type: str
+  when: false
+  default: "{{ project_name.replace('-', '_') }}"
+
+description:
+  type: str
+  help: "Short project description"
+  default: "A minimal CLI tool scaffold"
+
+author_name:
+  type: str
+  help: "Your name"
+
+author_email:
+  type: str
+  help: "Your email"
+  validator: >-
+    {% if '@' not in author_email %}
+    author_email must be a valid email address
+    {% endif %}

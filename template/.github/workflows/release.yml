@@ -26,11 +26,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      # Tags this template repo itself (vX.Y.Z, from Conventional Commits) and updates
-      # CHANGELOG.md, so `copier copy` (which defaults to the latest tag) always resolves
-      # to a working template. No pypi_token: this repo isn't a published package — only
-      # the *generated* project (via template/.github/workflows/release.yml) publishes to PyPI.
       - name: Run Python Semantic Release
         uses: python-semantic-release/python-semantic-release@v9.8.6
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          pypi_token: ${{ secrets.PYPI_API_TOKEN }}
