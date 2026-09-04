@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v1.0.1 (2026-09-04)
+
+### Fix
+
+* fix(ci): pin trufflehog action to a real release tag
+
+The floating `@v3` tag on trufflesecurity/trufflehog no longer exists
+upstream (they only publish precise `vX.Y.Z` tags now), which broke
+the security job&#39;s &#34;Set up job&#34; step on push. Pin to v3.97.4 in both
+this repo&#39;s own ci.yml and the copy shipped inside template/ for
+generated projects.
+
+Co-Authored-By: Claude Sonnet 5 &lt;noreply@anthropic.com&gt;
+Claude-Session: https://claude.ai/code/session_01MkpJdUbmXe6dt5zmrUjNWp ([`2b8b67a`](https://github.com/briandcho/minimal-cli/commit/2b8b67a0f0c602529672ce13a0595d6d47971ba2))
+
 ## v1.0.0 (2026-09-04)
 
 ### Breaking
