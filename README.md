@@ -23,6 +23,10 @@ You'll be asked for:
 - `description` — short project description, used in `pyproject.toml` and `README.md`
 - `author_name` / `author_email` — used in `pyproject.toml` and `LICENSE`
 
+Before `tox` works in the generated project, run `git init` (setuptools-scm needs git metadata to
+compute the version) and `tox -e update_deps` (generates `requirements.txt`/`requirements-dev.txt`,
+which aren't shipped in the template) — see the generated project's own README for details.
+
 The generated project looks like:
 
 ```
