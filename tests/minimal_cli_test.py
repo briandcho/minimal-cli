@@ -50,7 +50,7 @@ def test_generated_project_structure_and_substitutions(tmp_path):
     assert 'name = "my-project"' in pyproject
     assert 'description = "An example generated project"' in pyproject
     assert 'name = "Jane Doe", email = "jane@example.com"' in pyproject
-    assert 'scripts."my-project" = "my_project:main"' in pyproject
+    assert 'scripts.my-project = "my_project:main"' in pyproject
 
     readme = (dst / "README.md").read_text()
     assert readme.startswith("# my-project")
