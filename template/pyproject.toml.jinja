@@ -26,7 +26,7 @@ optional-dependencies.dev = [
   "covdefaults",
   "pytest-cov",
 ]
-scripts."{{ project_name }}" = "{{ python_module }}:main"
+scripts.{{ project_name }} = "{{ python_module }}:main"
 
 [tool.setuptools]
 packages.find.exclude = [ "tests", "tests.*" ]
