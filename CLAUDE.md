@@ -12,7 +12,7 @@ Run via `tox`, which drives both testing and pre-commit:
 
 ```sh
 tox -e py            # run tests with coverage (pytest + coverage report)
-tox -e pre-commit    # run all pre-commit hooks (ruff, ruff-format, mypy, bandit, etc.)
+tox -e pre-commit    # run pre-commit-stage hooks (ruff, ruff-format, mypy, bandit, etc.) — excludes pip-audit, see below
 tox                  # run both py and pre-commit envs
 tox -e update_deps   # regenerate requirements*.txt via pip-compile and autoupdate pre-commit hooks
 ```
@@ -29,7 +29,8 @@ Lint/format/type-check individually via pre-commit's underlying tools if needed:
 
 - Package version comes from `setuptools-scm` (git tags), not a hardcoded string — `__version__` in `minimal_cli.py` resolves via `importlib.metadata.version("minimal-cli")`, which requires the package to be installed in the running environment; it raises `PackageNotFoundError` if run from an uninstalled checkout (e.g. `python minimal_cli.py` without `pip install -e .` first).
 - CI (`.github/workflows/ci.yml`) runs security scans, tests across Python 3.10–3.14, then builds. Pushing a `v*` tag triggers `publish` to PyPI via trusted `TWINE_PASSWORD`/`twine upload`.
-- Commit messages must follow Conventional Commits — enforced by a Commitizen `commit-msg` hook. Install hooks with `pre-commit install --hook-type pre-commit --hook-type commit-msg`.
+- Commit messages must follow Conventional Commits — enforced by a Commitizen `commit-msg` hook. Install hooks with `pre-commit install --hook-type pre-commit --hook-type pre-push --hook-type commit-msg`.
+- `pip-audit` (network-bound dependency vulnerability scan) is scoped to `stages: [pre-push]` in `.pre-commit-config.yaml`, so it's excluded from `tox -e pre-commit`/the default commit-time hook run to keep local iteration fast. It still runs on `git push` (if the `pre-push` hook type is installed) and as its own step in CI's `security` job (`.github/workflows/ci.yml`) — don't assume `tox -e pre-commit` passing means dependencies are vulnerability-free.
 
 ## Adding functionality
 

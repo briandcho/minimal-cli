@@ -33,6 +33,14 @@ jobs:
         with:
           python-version: '3.11'
 
+      # Runs here (rather than in the pre-commit hook set) so local pre-commit stays fast;
+      # the pip-audit pre-commit hook is deferred to the pre-push stage for the same reason.
+      - name: Run pip-audit dependency vulnerability scanner
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+          pip-audit -r requirements.txt
+
   test:
     runs-on: ubuntu-latest
     strategy:
