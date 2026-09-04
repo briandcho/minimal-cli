@@ -41,6 +41,14 @@ jobs:
           pip install pip-audit
           pip-audit -r requirements.txt
 
+      # Runs here (rather than in the pre-commit hook set) so local pre-commit stays fast;
+      # the checkov pre-commit hook is deferred to the pre-push stage for the same reason.
+      - name: Run checkov IaC security scanner
+        run: |
+          python -m pip install --upgrade pip
+          pip install checkov==3.3.16
+          checkov --framework github_actions -d .github/workflows
+
   test:
     runs-on: ubuntu-latest
     strategy:

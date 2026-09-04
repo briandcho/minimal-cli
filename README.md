@@ -24,7 +24,7 @@ minimal-cli -V
 
 ### Install pre-commit hooks (including commit message checks)
 
-This repo enforces Conventional Commits via a `commit-msg` hook (Commitizen). Most checks run on every commit; `pip-audit` (a network-bound dependency vulnerability scan) is deferred to `pre-push` so it doesn't slow down every commit.
+This repo enforces Conventional Commits via a `commit-msg` hook (Commitizen). Most checks run on every commit; `pip-audit` (a network-bound dependency vulnerability scan) and `checkov` (an IaC scanner) are deferred to `pre-push` so they don't slow down every commit.
 
 Install hooks locally:
 

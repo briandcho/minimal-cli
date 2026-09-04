@@ -21,6 +21,7 @@ repos:
         files: \.github/workflows/.*\.ya?ml$
         entry: checkov --framework github_actions
         require_serial: true
+        stages: [pre-push]
 -   repo: https://github.com/pypa/pip-audit
     rev: v2.10.1
     hooks:

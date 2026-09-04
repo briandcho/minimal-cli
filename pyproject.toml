@@ -50,12 +50,12 @@ run.plugins = [ "covdefaults" ]
 
 [tool.tox]
 env_list = [ "pre-commit", "py" ]
-env.pre-commit.description = "Run pre-commit hooks (excludes pre-push-only checks like pip-audit)"
+env.pre-commit.description = "Run pre-commit hooks (excludes pre-push-only checks like pip-audit, checkov)"
 env.pre-commit.skip_install = true
 env.pre-commit.deps = [ "pre-commit" ]
-# pip-audit (stages: [pre-push]) is deliberately excluded here to keep this fast for local
-# dev use; it still runs on `git push` (if the pre-push hook type is installed) and in CI's
-# security job.
+# pip-audit and checkov (stages: [pre-push]) are deliberately excluded here to keep this fast
+# for local dev use; they still run on `git push` (if the pre-push hook type is installed) and
+# as standalone steps in CI's security job.
 env.pre-commit.commands = [ [ "pre-commit", "run", "--all-files", "--show-diff-on-failure" ] ]
 env.update_deps.description = "Update requirements*.txt files and pre-commit hooks"
 env.update_deps.skip_install = true
