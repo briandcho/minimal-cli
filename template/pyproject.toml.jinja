@@ -56,7 +56,15 @@ env.pre-commit.deps = [ "pre-commit" ]
 # pip-audit and checkov (stages: [pre-push]) are deliberately excluded here to keep this fast
 # for local dev use; they still run on `git push` (if the pre-push hook type is installed) and
 # as standalone steps in CI's security job.
-env.pre-commit.commands = [ [ "pre-commit", "run", "--all-files", "--show-diff-on-failure" ] ]
+env.pre-commit.commands = [
+  [
+    "pre-commit",
+    "run",
+    "--all-files",
+    "--show-diff-on-failure",
+    { replace = "posargs", default = [ ], extend = true },
+  ],
+]
 env.update_deps.description = "Update requirements*.txt files and pre-commit hooks"
 env.update_deps.skip_install = true
 env.update_deps.deps = [ "pip-tools", "pre-commit" ]

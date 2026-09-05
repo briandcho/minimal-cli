@@ -76,6 +76,13 @@ tox -e py
 tox -e pre-commit
 ```
 
+- Run the pre-push-only hooks too (`pip-audit`, `checkov`) by passing extra args through to
+  `pre-commit run` after `--`:
+
+```sh
+tox -e pre-commit -- --hook-stage pre-push
+```
+
 - Update pinned dependencies and pre-commit hooks:
 
 ```sh
