@@ -46,6 +46,12 @@ def test_generated_project_structure_and_substitutions(tmp_path):
     leftover = [p for p in dst.rglob("*{{*")]
     assert leftover == []
 
+    # .copier-answers.yml must be generated so `copier update` (used by
+    # auto-update-deps.yml) has a source of truth for the template URL/version.
+    answers = (dst / ".copier-answers.yml").read_text()
+    assert "project_name: my-project" in answers
+    assert "author_name: Jane Doe" in answers
+
     pyproject = (dst / "pyproject.toml").read_text()
     assert 'name = "my-project"' in pyproject
     assert 'description = "An example generated project"' in pyproject
