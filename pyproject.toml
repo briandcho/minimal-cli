@@ -2,6 +2,8 @@
 name = "minimal-cli-template"
 version = "0.0.0"
 description = "Copier template for scaffolding a minimal Python CLI project"
+license = "MIT"
+license-files = [ "LICENSE" ]
 requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
