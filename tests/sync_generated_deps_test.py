@@ -1,12 +1,24 @@
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
+
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
-from sync_generated_deps import sync_requirements
+from sync_generated_deps import _require, sync_requirements
+
+
+def test_require_returns_the_resolved_path_for_an_executable_on_path():
+    assert _require("python3") == shutil.which("python3")
+
+
+def test_require_raises_for_an_executable_not_on_path():
+    with pytest.raises(FileNotFoundError, match="not-a-real-executable"):
+        _require("not-a-real-executable")
 
 
 def test_sync_requirements_replaces_project_name_and_copies_pre_commit_config(tmp_path):
