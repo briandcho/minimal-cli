@@ -1,0 +1,73 @@
+name: Auto Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tox and copier
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox copier
+
+      - name: Update this repo's own requirements-dev.txt and pre-commit hooks
+        run: tox -e update_deps
+
+      # Generated projects don't run pip-compile themselves (see README.md) -- their
+      # requirements*.txt ship as template payload instead, kept fresh here by generating a
+      # throwaway project from this checkout and copying its resolved pins back into template/.
+      - name: Sync generated-project requirements into template/
+        run: python scripts/sync_generated_deps.py
+
+      - name: Find existing auto-update PR
+        id: find_pr
+        uses: peter-evans/find-pull-request@v3
+        with:
+          branch: chore/auto-update-deps
+          state: open
+
+      - name: Close previous auto-update PR (if any)
+        if: steps.find_pr.outputs.pull-request-number != ''
+        uses: peter-evans/close-pull@v3
+        with:
+          pull-request-number: ${{ steps.find_pr.outputs.pull-request-number }}
+          comment: Closing prior auto-update PR in favor of a fresh one.
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(deps): update requirements and pre-commit hooks'
+          title: 'chore(deps): weekly dependency updates'
+          body: |
+            This automated PR updates pinned dependencies for this repo and for generated
+            projects.
+
+            - This repo's own `requirements-dev.txt` updated via pip-tools, and
+              `.pre-commit-config.yaml` autoupdated
+            - `template/requirements.txt.jinja` / `template/requirements-dev.txt.jinja` and
+              `template/.pre-commit-config.yaml` refreshed from a freshly generated throwaway
+              project (see `scripts/sync_generated_deps.py`)
+          branch: chore/auto-update-deps
+          labels: dependencies, automated
+          signoff: false
