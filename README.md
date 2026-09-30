@@ -13,8 +13,9 @@ copier copy https://github.com/briandcho/minimal-cli my-project
 ```
 
 `copier copy` fetches this repo's *latest git tag* by default (not `main`'s HEAD). Releases are cut
-manually by running `.github/workflows/release.yml` (`workflow_dispatch`), which tags the next
-version from Conventional Commits — see `CLAUDE.md` if you're maintaining this repo.
+automatically on every push to `main` by `.github/workflows/release.yml`, which tags the next
+version from Conventional Commits (a no-op if there's nothing releasable) — see `CLAUDE.md` if
+you're maintaining this repo.
 
 You'll be asked for:
 
@@ -22,22 +23,32 @@ You'll be asked for:
   Python module name (`my_project`)
 - `description` — short project description, used in `pyproject.toml` and `README.md`
 - `author_name` / `author_email` — used in `pyproject.toml` and `LICENSE`
+- `include_dep_automation` — whether to include a scheduled workflow that opens PRs to keep
+  dependencies and Actions pins current (default yes)
 
 Before `tox` works in the generated project, run `git init` (setuptools-scm needs git metadata to
-compute the version) and `tox -e update_deps` (generates `requirements.txt`/`requirements-dev.txt`,
-which aren't shipped in the template) — see the generated project's own README for details.
+compute the version) — see the generated project's own README for details.
+`requirements.txt`/`requirements-dev.txt` ship with the template already resolved, so no separate
+`pip-compile` step is needed first.
 
 The generated project looks like:
 
 ```
 my-project/
-├── .github/workflows/{auto-update-deps,ci,release}.yml
+├── .github/
+│   ├── dependabot.yml           # only if include_dep_automation
+│   └── workflows/
+│       ├── auto-update-deps.yml # only if include_dep_automation
+│       ├── ci.yml
+│       └── release.yml
 ├── .gitignore
 ├── .pre-commit-config.yaml
 ├── LICENSE
 ├── my_project.py
 ├── pyproject.toml
 ├── README.md
+├── requirements.txt
+├── requirements-dev.txt
 └── tests/
     ├── __init__.py
     └── my_project_test.py
@@ -49,9 +60,10 @@ my-project/
   project doesn't itself contain a nested `template/` folder).
 - `template/` — the actual template payload. Files ending in `.jinja` are rendered with the
   answers above (and have the suffix stripped); everything else is copied byte-for-byte.
-- Everything else at the repo root (`pyproject.toml`, `tests/`, `.pre-commit-config.yaml`,
-  `.github/workflows/{ci,release}.yml`) is this repo's own dev tooling, used only to test that the
-  template renders correctly and to keep it tagged — it is not part of what gets generated.
+- Everything else at the repo root (`pyproject.toml`, `tests/`, `scripts/`,
+  `.pre-commit-config.yaml`, `.github/`) is this repo's own dev tooling, used only to test that the
+  template renders correctly and to keep it and generated projects' pins current — it is not part
+  of what gets generated.
 
 ## Development
 
@@ -106,8 +118,12 @@ tox -e pre-commit
 tox -e pre-commit -- --hook-stage pre-push
 ```
 
-- Update pinned dependencies and pre-commit hooks:
+- Update this repo's own pinned dependencies and pre-commit hooks (also refreshes
+  `template/requirements*.txt.jinja` and `template/.pre-commit-config.yaml` via
+  `scripts/sync_generated_deps.py` — see `.github/workflows/deps-update.yml`, which runs both on
+  a weekly schedule):
 
 ```sh
 tox -e update_deps
+python scripts/sync_generated_deps.py
 ```

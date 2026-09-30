@@ -16,8 +16,8 @@ plus the tooling to test that the template renders correctly.
   byte-for-byte (this matters for `template/.github/workflows/*.yml`, which use `${{ github.* }}`
   syntax that would otherwise collide with Jinja).
 - Everything else at the repo root (`pyproject.toml`, `tests/`, `.pre-commit-config.yaml`,
-  `.github/workflows/ci.yml`) is this repo's own dev tooling — used only to verify the template,
-  never shipped to generated projects.
+  `.github/workflows/`, `scripts/`) is this repo's own dev tooling — used only to verify/maintain
+  the template, never shipped to generated projects.
 
 **When editing generated-looking files, always edit the source under `template/`, never a copy in
 a generated output directory.** When changing something that should appear in every generated
@@ -58,16 +58,35 @@ copier copy . /tmp/my-project
   my-project` (no explicit `--vcs-ref`) makes copier fetch the *latest git tag*, not `main`'s
   HEAD. So the tag has to actually point at a commit containing `copier.yml`/`template/` for the
   command in the README to work — a stale or missing tag silently serves an old/broken template.
-- `.github/workflows/release.yml` at the repo root is **manual-only** (`workflow_dispatch`, no
-  `push` trigger) — running `python-semantic-release version --no-changelog --no-commit`, which
-  tags `vX.Y.Z` from Conventional Commits, pushes the tag, and publishes a GitHub Release, but only
-  when someone deliberately runs the workflow. It has no `pypi_token` and never builds/publishes
-  anything — this repo isn't a package, tagging is purely so `copier copy` has something current to
-  resolve. There's no root `CHANGELOG.md`: it would just duplicate the notes on the GitHub Release
-  page this step already publishes, and nothing here consumes it (this repo isn't installed as a
-  package). (`tests/minimal_cli_test.py`'s own `generate()` sidesteps tag resolution entirely by
-  passing `vcs_ref="HEAD"`, so local test runs always exercise the current checkout regardless of
-  tags.)
+- `.github/workflows/release.yml` at the repo root runs on **every push to `main`** (plus
+  `workflow_dispatch` for an on-demand run) — it runs
+  `python-semantic-release version --no-changelog --no-commit`, which tags `vX.Y.Z` from
+  Conventional Commits, pushes the tag, and publishes a GitHub Release, or no-ops if there's
+  nothing releasable since the last tag. It has no `pypi_token` and never builds/publishes
+  anything — this repo isn't a package, tagging is purely so `copier copy`/`copier update` always
+  have something current to resolve (this matters more now that `requirements*.txt` in generated
+  projects are refreshed via `copier update` rather than locally — see the dependency-automation
+  bullet below). There's no root `CHANGELOG.md`: it would just duplicate the notes on the GitHub
+  Release page this step already publishes, and nothing here consumes it (this repo isn't
+  installed as a package). (`tests/minimal_cli_test.py`'s own `generate()` sidesteps tag
+  resolution entirely by passing `vcs_ref="HEAD"`, so local test runs always exercise the current
+  checkout regardless of tags.) This is deliberately scoped to this repo's own tagging only —
+  `template/.github/workflows/release.yml` (the *generated* project's own PyPI-publishing
+  workflow) stays `workflow_dispatch`-only; auto-publishing a package on every push is a separate
+  decision left to each downstream maintainer.
+- **Dependency automation**: `.github/dependabot.yml` bumps GitHub Actions pins in this repo's own
+  `.github/workflows/*.yml` (it can't see `template/.github/workflows/*.yml` — Dependabot's
+  `github-actions` ecosystem only ever scans the literal `.github/workflows/` path). The weekly
+  `.github/workflows/deps-update.yml` runs `tox -e update_deps` for this repo's own
+  `requirements-dev.txt`/`.pre-commit-config.yaml`, and additionally runs
+  `scripts/sync_generated_deps.py`, which generates a throwaway project from the current checkout,
+  runs `tox -e update_deps` inside *it*, and copies the result back into
+  `template/requirements.txt.jinja` / `template/requirements-dev.txt.jinja` /
+  `template/.pre-commit-config.yaml`. Generated projects never run `pip-compile` themselves —
+  their `requirements*.txt` ship as real template payload and stay fresh via `copier update`
+  (see `template/.github/workflows/auto-update-deps.yml`, opt-in via the `include_dep_automation`
+  copier question), which is why `release.yml` above needs to tag on every push rather than only
+  manually.
 - If this repo ever opens to real external code contributions, revisit this: `commitizen`'s
   Conventional-Commit enforcement is a local git hook contributors won't have installed, and
   `googleapis/release-please-action` (a PR-based release flow versioned from Conventional-Commit-
