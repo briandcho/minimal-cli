@@ -1,4 +1,15 @@
 _subdirectory: template
+_exclude:
+  - "copier.yaml"
+  - "copier.yml"
+  - "~*"
+  - "*.py[co]"
+  - "__pycache__"
+  - ".git"
+  - ".DS_Store"
+  - ".svn"
+  - "{% if not include_dep_automation %}.github/workflows/auto-update-deps.yml{% endif %}"
+  - "{% if not include_dep_automation %}.github/dependabot.yml{% endif %}"
 
 project_name:
   type: str
@@ -30,3 +41,8 @@ author_email:
     {% if '@' not in author_email %}
     author_email must be a valid email address
     {% endif %}
+
+include_dep_automation:
+  type: bool
+  help: "Include a scheduled workflow that opens PRs to keep dependencies and Actions pins current?"
+  default: true

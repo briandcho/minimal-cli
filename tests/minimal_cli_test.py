@@ -18,14 +18,14 @@ ANSWERS = {
 }
 
 
-def generate(dst: Path) -> None:
+def generate(dst: Path, **answer_overrides: object) -> None:
     # vcs_ref="HEAD" is required: copier defaults to the latest git tag for local git
     # sources, which would render an old, pre-template commit instead of this checkout
     # (including any uncommitted changes, since the source repo is dirty).
     copier.run_copy(
         str(REPO_ROOT),
         str(dst),
-        data=ANSWERS,
+        data={**ANSWERS, **answer_overrides},
         defaults=True,
         overwrite=True,
         vcs_ref="HEAD",
@@ -81,6 +81,35 @@ def test_generated_project_structure_and_substitutions(tmp_path):
             "${{ github" in workflow.read_text()
             or "${{ secrets" in workflow.read_text()
         )
+
+    assert (dst / ".github" / "dependabot.yml").is_file()
+
+    requirements_dev = (dst / "requirements-dev.txt").read_text()
+    assert "my-project" in requirements_dev
+
+
+def test_include_dep_automation_false_omits_dependabot_and_auto_update_workflow(
+    tmp_path,
+):
+    dst = tmp_path / "generated"
+    generate(dst, include_dep_automation=False)
+
+    assert not (dst / ".github" / "dependabot.yml").exists()
+    assert not (dst / ".github" / "workflows" / "auto-update-deps.yml").exists()
+
+    # Unrelated workflows and payload are unaffected.
+    assert (dst / ".github" / "workflows" / "ci.yml").is_file()
+    assert (dst / ".github" / "workflows" / "release.yml").is_file()
+    assert (dst / "requirements-dev.txt").is_file()
+
+
+def test_requirements_render_with_the_chosen_project_name(tmp_path):
+    dst = tmp_path / "generated"
+    generate(dst, project_name="widget-cli")
+
+    requirements_dev = (dst / "requirements-dev.txt").read_text()
+    assert "widget-cli" in requirements_dev
+    assert "my-project" not in requirements_dev
 
 
 def test_generated_project_installs_and_passes_its_own_tests(tmp_path):

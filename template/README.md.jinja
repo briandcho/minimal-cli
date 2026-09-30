@@ -83,7 +83,9 @@ tox -e pre-commit
 tox -e pre-commit -- --hook-stage pre-push
 ```
 
-- Update pinned dependencies and pre-commit hooks:
+- `requirements.txt`/`requirements-dev.txt` and `.pre-commit-config.yaml` are refreshed upstream
+  in the template and pulled in via `copier update` (see `.github/workflows/auto-update-deps.yml`
+  if this project included it). To manually re-pin sooner than the next template sync:
 
 ```sh
 tox -e update_deps
