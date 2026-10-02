@@ -54,7 +54,7 @@ jobs:
           comment: Closing prior auto-update PR in favor of a fresh one.
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'chore(deps): update requirements and pre-commit hooks'
